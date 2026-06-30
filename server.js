@@ -73,7 +73,7 @@ REGRAS DE CLASSIFICAÇÃO:
 REGRAS PARA O CAMPO ASSUNTO:
 - Escreva uma frase curta em CAIXA ALTA resumindo o fato concreto da matéria, no estilo usado pelo Akaii
 - Exemplos reais: "LANÇAMENTO DE ÍNDICE ON DEMAND", "OSCILAÇÃO DO IFIX", "LANÇAMENTO DE CONTRATOS PREDITIVOS DE IPCA E PIB"
-- Deve ser objetivo, sem opinião, capturando o fato principal em até 8 palavras e padronizando assuntos criados anteriormente com o objetivo que categoriza-los
+- Deve ser objetivo, sem opinião, capturando o fato principal em até 8 palavras
 
 REGRAS PARA O CAMPO AVALIAÇÃO QUALITATIVA INSTITUCIONAL:
 - POSITIVA: a matéria favorece a imagem institucional da B3 (inovação, crescimento, liderança, expansão, reconhecimento)
@@ -81,12 +81,13 @@ REGRAS PARA O CAMPO AVALIAÇÃO QUALITATIVA INSTITUCIONAL:
 - NEGATIVA: a matéria associa a B3 a riscos, falhas, críticas, perdas, processos, concorrência avançando sobre ela, ou contextos desfavoráveis
 - Justifique a avaliação em 1 frase
 
-REGRAS PARA O CAMPO SUGESTÃO DE PORTA-VOZ:
-- Este campo é OPCIONAL. Só preencha se a matéria não citar NENHUM porta-voz da B3 e houver uma lacuna editorial relevante (ex: a B3 é protagonista do fato mas nenhuma fala institucional foi buscada pelo veículo)
-- Se a matéria já cita um porta-voz da lista oficial, responda apenas "Não aplicável — matéria já cita porta-voz da B3"
-- Se a matéria não cita porta-voz mas também não há necessidade real de fala institucional (ex: matéria puramente factual de cotação, dado de mercado, ou menção colateral), responda "Não aplicável"
-- NUNCA sugira um nome só porque ele está mapeado no tema/subtema. A sugestão só vale quando há uma lacuna editorial concreta que faria sentido a B3 preencher com uma fala
-- Quando sugerir, justifique com base no fato específico da matéria, não apenas no tema genérico
+REGRAS PARA O CAMPO SUGESTÃO DE PORTA-VOZ — LEIA COM ATENÇÃO:
+- PRIMEIRO passo obrigatório: verifique se algum nome da lista de porta-vozes oficiais aparece EXPLICITAMENTE no texto da matéria, citado com fala, cargo, ou menção direta
+- Se SIM, um porta-voz foi citado → responda exatamente: "CITADO NA MATÉRIA: [nome encontrado]"
+- Se NÃO, nenhum porta-voz foi citado → responda exatamente: "NÃO CITADO NENHUM PORTA-VOZ NA MATÉRIA" como primeira linha, e só then avalie se vale anotar uma sugestão
+- É PROIBIDO sugerir um nome apenas porque ele está mapeado no tema ou subtema da arquitetura. O mapeamento de porta-vozes por tema serve para você ENTENDER a estrutura da B3, não para preencher esse campo automaticamente
+- Uma sugestão de nome só pode aparecer DEPOIS da linha "NÃO CITADO NENHUM PORTA-VOZ NA MATÉRIA", e apenas se a B3 for protagonista central do fato (não apenas mencionada) e o veículo claramente não buscou nenhuma fala institucional sobre um fato relevante
+- Para a grande maioria das matérias (cotações, dados de mercado, menções colaterais, fechamento de pregão), a resposta correta é apenas "NÃO CITADO NENHUM PORTA-VOZ NA MATÉRIA" sem sugestão adicional
 
 FORMATO DE SAÍDA (exato, sem texto adicional):
 TEMA: [número e nome]
