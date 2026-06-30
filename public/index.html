@@ -74,7 +74,16 @@
   .badge-blue { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
   .hist-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
   .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
-  .copy-btn { float: right; }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .tab { padding: 10px 18px; font-size: 14px; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; border-radius: 0; border-left: none; border-right: none; border-top: none; height: auto; }
+  .tab:hover { background: none; color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .id-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .id-row .id-field { flex: 1; min-width: 200px; }
+  input[type="text"] { width: 100%; height: 38px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; background: #fafaf9; color: var(--text); }
+  input[type="text"]:focus { outline: none; border-color: var(--accent); background: #fff; }
+  .preview-box { background: #fafaf9; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-top: 12px; font-size: 13px; color: var(--text-secondary); max-height: 160px; overflow-y: auto; line-height: 1.5; }
+  .preview-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
   @media (max-width: 600px) { .result-body { grid-template-columns: 1fr; } .result-field.full { grid-column: 1; } }
 </style>
 </head>
@@ -87,18 +96,41 @@
 
 <div class="container">
 
-  <div class="card">
-    <label for="txt">Texto da matéria</label>
-    <textarea id="txt" placeholder="Cole aqui o título e texto completo da matéria..."></textarea>
-    <div class="row">
-      <button class="btn-primary" id="btn-analisar" onclick="analisar()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Analisar
-      </button>
-      <button onclick="limpar()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-        Limpar
-      </button>
+  <div class="tabs">
+    <button class="tab active" id="tab-texto-btn" onclick="trocarAba('texto')">Colar texto</button>
+    <button class="tab" id="tab-id-btn" onclick="trocarAba('id')">Buscar por ID</button>
+  </div>
+
+  <div id="aba-texto">
+    <div class="card">
+      <label for="txt">Texto da matéria</label>
+      <textarea id="txt" placeholder="Cole aqui o título e texto completo da matéria..."></textarea>
+      <div class="row">
+        <button class="btn-primary" id="btn-analisar" onclick="analisar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Analisar
+        </button>
+        <button onclick="limpar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          Limpar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="aba-id" style="display:none">
+    <div class="card">
+      <label for="noticia-id">ID da notícia no Akaii</label>
+      <div class="id-row">
+        <div class="id-field">
+          <input type="text" id="noticia-id" placeholder="Ex: 231396331">
+        </div>
+        <button class="btn-primary" id="btn-buscar" onclick="buscarPorId()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Buscar e analisar
+        </button>
+      </div>
+      <div id="preview-noticia"></div>
     </div>
   </div>
 
@@ -117,6 +149,93 @@
 <script>
 const ID_MAP = {'1':38039,'2':37877,'3':38019,'4':37869,'5':37881,'6':37888,'7':37879,'8':37886,'9':38038,'10':37889,'11':37891,'12':37860};
 let historico = [];
+let noticiaAtualId = null;
+
+function trocarAba(aba){
+  document.getElementById('aba-texto').style.display = aba === 'texto' ? 'block' : 'none';
+  document.getElementById('aba-id').style.display = aba === 'id' ? 'block' : 'none';
+  document.getElementById('tab-texto-btn').classList.toggle('active', aba === 'texto');
+  document.getElementById('tab-id-btn').classList.toggle('active', aba === 'id');
+  document.getElementById('status').innerHTML = '';
+}
+
+async function buscarPorId(){
+  const id = document.getElementById('noticia-id').value.trim();
+  if(!id){ alert('Informe o ID da notícia.'); return; }
+
+  const btn = document.getElementById('btn-buscar');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Buscando...';
+  document.getElementById('preview-noticia').innerHTML = '';
+  document.getElementById('resultado').innerHTML = '';
+  document.getElementById('status').innerHTML = '';
+
+  try {
+    const r = await fetch(`/buscar-noticia?id=${encodeURIComponent(id)}`);
+    const data = await r.json();
+    if(data.error) throw new Error(data.error);
+
+    noticiaAtualId = id;
+    document.getElementById('preview-noticia').innerHTML = `
+      <div class="preview-box">
+        <div class="preview-title">${data.titulo}</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-bottom:8px">${data.veiculo} · ${data.data}</div>
+        ${data.texto.slice(0,400)}${data.texto.length > 400 ? '...' : ''}
+      </div>
+    `;
+
+    btn.innerHTML = '<div class="spinner"></div> Classificando...';
+    document.getElementById('resultado').innerHTML = '<div class="loading"><div class="spinner"></div> Classificando com IA...</div>';
+
+    const textoCompleto = `${data.titulo}\n\n${data.texto}`;
+    const r2 = await fetch('/classificar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto: textoCompleto })
+    });
+    const data2 = await r2.json();
+    if(data2.error) throw new Error(data2.error);
+
+    const p = parse(data2.resultado);
+    const conf = calcConf(p);
+    historico.unshift({ texto: data.titulo.slice(0,90), result: p, ts: new Date() });
+    renderResultado(p, conf, id);
+    renderHistorico();
+  } catch(e) {
+    document.getElementById('resultado').innerHTML = '';
+    document.getElementById('status').innerHTML = `<div class="alert alert-error">Erro: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Buscar e analisar';
+  }
+}
+
+async function gravarNoAkaii(){
+  const p = window._lastResult;
+  if(!p || !noticiaAtualId || !p.id_akaii){
+    document.getElementById('status').innerHTML = '<div class="alert alert-error">Não foi possível gravar — falta ID da notícia ou categoria.</div>';
+    return;
+  }
+  const btn = document.getElementById('btn-gravar');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Gravando...';
+
+  try {
+    const r = await fetch('/gravar-categoria', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: noticiaAtualId, id_akaii: p.id_akaii })
+    });
+    const data = await r.json();
+    if(data.error) throw new Error(data.error);
+    document.getElementById('status').innerHTML = '<div class="alert alert-ok">Categoria gravada no Akaii com sucesso.</div>';
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Gravado';
+  } catch(e) {
+    document.getElementById('status').innerHTML = `<div class="alert alert-error">Erro ao gravar: ${e.message}</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Gravar no Akaii';
+  }
+}
 
 function limpar(){
   document.getElementById('txt').value = '';
@@ -211,12 +330,13 @@ function pvNaoCitado(s){
   return s && s.toUpperCase().includes('NÃO CITADO');
 }
 
-function renderResultado(p, conf){
+function renderResultado(p, conf, idNoticia){
   const hasPV = p.pv && p.pv !== 'Nenhum' && p.pv.length > 2;
   const hasAlerta = p.alerta && p.alerta !== 'Nenhum' && p.alerta.length > 2;
   const hasAssunto = p.assunto && p.assunto.length > 2;
   const hasAval = p.avaliacao && p.avaliacao.length > 2;
   const hasSugestao = p.sugestaoPV && p.sugestaoPV.length > 2;
+  const mostrarGravar = !!idNoticia && !!p.id_akaii;
 
   document.getElementById('resultado').innerHTML = `
     <div class="result-card">
@@ -276,6 +396,13 @@ function renderResultado(p, conf){
         </div>
         <div class="conf-pct" style="color:${confColor(conf)}">${conf}%</div>
       </div>
+      ${mostrarGravar ? `
+      <div style="padding:12px 20px;border-top:1px solid var(--border)">
+        <button class="btn-primary btn-sm" id="btn-gravar" onclick="gravarNoAkaii()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+          Gravar no Akaii
+        </button>
+      </div>` : ''}
     </div>
   `;
   window._lastResult = p;
