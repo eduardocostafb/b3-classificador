@@ -172,8 +172,14 @@ async function buscarPorId(){
 
   try {
     const r = await fetch(`/buscar-noticia?id=${encodeURIComponent(id)}`);
-    const data = await r.json();
-    if(data.error) throw new Error(data.error);
+    const rawText = await r.text();
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      throw new Error('O servidor retornou uma resposta inesperada. Veja o console do navegador (F12) para detalhes.');
+    }
+    if(data.error) throw new Error(data.error + (data.raw_preview ? ` — Resposta: ${data.raw_preview}` : ''));
 
     noticiaAtualId = id;
     document.getElementById('preview-noticia').innerHTML = `
