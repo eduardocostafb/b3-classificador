@@ -204,6 +204,12 @@ function avalBg(a){
   if(v.includes('NEGATIVA')) return '#fef2f2';
   return '#fffbeb';
 }
+function pvCitado(s){
+  return s && s.toUpperCase().includes('CITADO NA MATÉRIA');
+}
+function pvNaoCitado(s){
+  return s && s.toUpperCase().includes('NÃO CITADO');
+}
 
 function renderResultado(p, conf){
   const hasPV = p.pv && p.pv !== 'Nenhum' && p.pv.length > 2;
@@ -249,8 +255,8 @@ function renderResultado(p, conf){
         </div>` : ''}
         ${hasSugestao ? `
         <div class="result-field full">
-          <div class="field-label">Sugestão de porta-voz</div>
-          <div class="field-value">${p.sugestaoPV}</div>
+          <div class="field-label">Porta-voz citado na matéria</div>
+          <div class="field-value" style="${pvNaoCitado(p.sugestaoPV) ? 'background:var(--danger-bg);border-color:#fecaca;color:var(--danger);font-weight:600' : pvCitado(p.sugestaoPV) ? 'background:var(--success-bg);border-color:#bbf7d0;color:var(--success);font-weight:600' : ''}">${p.sugestaoPV}</div>
         </div>` : ''}
         ${hasPV ? `
         <div class="result-field full">
