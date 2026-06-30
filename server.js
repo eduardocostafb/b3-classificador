@@ -46,10 +46,22 @@ app.get('/buscar-noticia', async (req, res) => {
   try {
     const url = `http://noticia.valuescomunicacao.com.br/b3/api/noticia/?key=${AKAII_KEY}&id=${id}&formato=json`;
     const r = await fetch(url);
-    const data = await r.json();
+    const rawText = await r.text();
+
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      console.error('Resposta não-JSON da API Akaii:', rawText.slice(0, 500));
+      return res.status(502).json({
+        error: 'A API do Akaii retornou uma resposta inválida (não-JSON). Verifique a chave AKAII_API_KEY ou se o ID existe.',
+        raw_preview: rawText.slice(0, 300)
+      });
+    }
+
     const item = Array.isArray(data) ? data[0] : data;
     if (!item || !item.texto) {
-      return res.status(404).json({ error: 'Notícia não encontrada ou sem texto disponível' });
+      return res.status(404).json({ error: 'Notícia não encontrada ou sem texto disponível', resposta_completa: data });
     }
     res.json({
       titulo: item.titulo || '',
