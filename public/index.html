@@ -234,7 +234,7 @@ async function gravarNoAkaii(){
     });
     const data = await r.json();
     if(data.error) throw new Error(data.error);
-    document.getElementById('status').innerHTML = '<div class="alert alert-ok">Categoria gravada no Akaii com sucesso.</div>';
+    document.getElementById('status').innerHTML = `<div class="alert alert-ok">Requisição enviada (status HTTP ${data.status_http}). Resposta do Akaii: "${data.resposta}". Confira no Akaii se a categoria realmente mudou.</div>`;
     btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Gravado';
   } catch(e) {
     document.getElementById('status').innerHTML = `<div class="alert alert-error">Erro ao gravar: ${e.message}</div>`;
