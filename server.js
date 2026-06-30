@@ -73,7 +73,7 @@ REGRAS DE CLASSIFICAÇÃO:
 REGRAS PARA O CAMPO ASSUNTO:
 - Escreva uma frase curta em CAIXA ALTA resumindo o fato concreto da matéria, no estilo usado pelo Akaii
 - Exemplos reais: "LANÇAMENTO DE ÍNDICE ON DEMAND", "OSCILAÇÃO DO IFIX", "LANÇAMENTO DE CONTRATOS PREDITIVOS DE IPCA E PIB"
-- Deve ser objetivo, sem opinião, capturando o fato principal em até 8 palavras
+- Deve ser objetivo, sem opinião, capturando o fato principal em até 8 palavras e padronizando assuntos criados anteriormente com o objetivo que categoriza-los
 
 REGRAS PARA O CAMPO AVALIAÇÃO QUALITATIVA INSTITUCIONAL:
 - POSITIVA: a matéria favorece a imagem institucional da B3 (inovação, crescimento, liderança, expansão, reconhecimento)
@@ -82,10 +82,11 @@ REGRAS PARA O CAMPO AVALIAÇÃO QUALITATIVA INSTITUCIONAL:
 - Justifique a avaliação em 1 frase
 
 REGRAS PARA O CAMPO SUGESTÃO DE PORTA-VOZ:
-- Indique qual porta-voz da lista oficial seria o mais adequado para ser ouvido ou citado sobre este assunto, com base na área de atuação dele
-- Use como referência o mapeamento de porta-vozes por tema/subtema feito acima
-- Se a matéria já cita um porta-voz da lista, apenas confirme que ele é o ideal e não precisa sugerir outro
-- Se nenhum porta-voz se encaixa claramente, responda "Nenhum porta-voz específico aplicável"
+- Este campo é OPCIONAL. Só preencha se a matéria não citar NENHUM porta-voz da B3 e houver uma lacuna editorial relevante (ex: a B3 é protagonista do fato mas nenhuma fala institucional foi buscada pelo veículo)
+- Se a matéria já cita um porta-voz da lista oficial, responda apenas "Não aplicável — matéria já cita porta-voz da B3"
+- Se a matéria não cita porta-voz mas também não há necessidade real de fala institucional (ex: matéria puramente factual de cotação, dado de mercado, ou menção colateral), responda "Não aplicável"
+- NUNCA sugira um nome só porque ele está mapeado no tema/subtema. A sugestão só vale quando há uma lacuna editorial concreta que faria sentido a B3 preencher com uma fala
+- Quando sugerir, justifique com base no fato específico da matéria, não apenas no tema genérico
 
 FORMATO DE SAÍDA (exato, sem texto adicional):
 TEMA: [número e nome]
