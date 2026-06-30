@@ -216,31 +216,13 @@ async function buscarPorId(){
   }
 }
 
-async function gravarNoAkaii(){
+function copiarComandoChrome(){
   const p = window._lastResult;
-  if(!p || !noticiaAtualId || !p.id_akaii){
-    document.getElementById('status').innerHTML = '<div class="alert alert-error">Não foi possível gravar — falta ID da notícia ou categoria.</div>';
-    return;
-  }
-  const btn = document.getElementById('btn-gravar');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> Gravando...';
-
-  try {
-    const r = await fetch('/gravar-categoria', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: noticiaAtualId, id_akaii: p.id_akaii })
-    });
-    const data = await r.json();
-    if(data.error) throw new Error(data.error);
-    document.getElementById('status').innerHTML = `<div class="alert alert-ok">Requisição enviada (status HTTP ${data.status_http}). Resposta do Akaii: "${data.resposta}". Confira no Akaii se a categoria realmente mudou.</div>`;
-    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Gravado';
-  } catch(e) {
-    document.getElementById('status').innerHTML = `<div class="alert alert-error">Erro ao gravar: ${e.message}</div>`;
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Gravar no Akaii';
-  }
+  if(!p || !noticiaAtualId || !p.id_akaii) return;
+  const comando = `Na notícia ID ${noticiaAtualId} aberta nesta página do Akaii, clique no link do campo "Assunto" para abrir o modal de categorias, desmarque a categoria atual se houver, marque o checkbox com value="${p.id_akaii}" (${p.tema}), clique em Salvar e confirme o alert de sucesso.`;
+  navigator.clipboard.writeText(comando).then(() => {
+    document.getElementById('status').innerHTML = '<div class="alert alert-ok">Comando copiado. Abra a notícia no Akaii, acione o Claude Chrome e cole o comando para gravar a categoria.</div>';
+  });
 }
 
 function limpar(){
@@ -403,11 +385,12 @@ function renderResultado(p, conf, idNoticia){
         <div class="conf-pct" style="color:${confColor(conf)}">${conf}%</div>
       </div>
       ${mostrarGravar ? `
-      <div style="padding:12px 20px;border-top:1px solid var(--border)">
-        <button class="btn-primary btn-sm" id="btn-gravar" onclick="gravarNoAkaii()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
-          Gravar no Akaii
+      <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="btn-primary btn-sm" id="btn-gravar" onclick="copiarComandoChrome()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar comando para Claude Chrome
         </button>
+        <span style="font-size:12px;color:var(--text-muted)">ID Akaii: <strong style="color:var(--text)">${p.id_akaii}</strong> — abra a notícia no Akaii e cole o comando no Claude Chrome</span>
       </div>` : ''}
     </div>
   `;
