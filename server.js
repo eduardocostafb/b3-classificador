@@ -82,22 +82,6 @@ app.get('/buscar-noticia', async (req, res) => {
   }
 });
 
-app.post('/gravar-categoria', async (req, res) => {
-  const { id, id_akaii } = req.body;
-  if (!id || !id_akaii) return res.status(400).json({ error: 'ID da notícia e ID da categoria obrigatórios' });
-
-  try {
-    const url = `http://noticia.valuescomunicacao.com.br/b3/site/m020/noticia_exe.asp?op=SALVAR_CATEGORIA&cd_noticia=${id}&lista_categoria=${id_akaii}`;
-    const r = await fetch(url);
-    const txt = await r.text();
-    console.log('Status HTTP:', r.status);
-    console.log('Resposta bruta do Akaii:', txt.slice(0, 500));
-    res.json({ ok: true, status_http: r.status, resposta: txt.slice(0, 500) });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
