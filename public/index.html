@@ -179,7 +179,7 @@ async function buscarPorId(){
     } catch {
       throw new Error('O servidor retornou uma resposta inesperada. Veja o console do navegador (F12) para detalhes.');
     }
-    if(data.error) throw new Error(data.error + (data.raw_preview ? ` — Resposta: ${data.raw_preview}` : ''));
+    if(data.error) throw new Error(data.error + (data.raw_preview ? ` — Resposta: ${data.raw_preview}` : '') + (data.debug_estrutura ? ` — Estrutura recebida: ${data.debug_estrutura}` : ''));
 
     noticiaAtualId = id;
     document.getElementById('preview-noticia').innerHTML = `
