@@ -61,7 +61,10 @@ app.get('/buscar-noticia', async (req, res) => {
 
     const item = Array.isArray(data) ? data[0] : data;
     if (!item || !item.texto) {
-      return res.status(404).json({ error: 'Notícia não encontrada ou sem texto disponível', resposta_completa: data });
+      return res.status(404).json({
+        error: 'Notícia não encontrada ou sem texto disponível',
+        debug_estrutura: JSON.stringify(data).slice(0, 1000)
+      });
     }
     res.json({
       titulo: item.titulo || '',
