@@ -36,6 +36,47 @@ app.post('/classificar', async (req, res) => {
   }
 });
 
+app.get('/buscar-noticia', async (req, res) => {
+  const { id } = req.query;
+  if (!id) return res.status(400).json({ error: 'ID da notícia obrigatório' });
+
+  const AKAII_KEY = process.env.AKAII_API_KEY;
+  if (!AKAII_KEY) return res.status(500).json({ error: 'Chave Akaii não configurada no servidor' });
+
+  try {
+    const url = `http://noticia.valuescomunicacao.com.br/b3/api/noticia/?key=${AKAII_KEY}&id=${id}&formato=json`;
+    const r = await fetch(url);
+    const data = await r.json();
+    const item = Array.isArray(data) ? data[0] : data;
+    if (!item || !item.texto) {
+      return res.status(404).json({ error: 'Notícia não encontrada ou sem texto disponível' });
+    }
+    res.json({
+      titulo: item.titulo || '',
+      texto: item.texto || '',
+      veiculo: item.veiculo || '',
+      data: item.data || '',
+      categoria_atual: item.categoria || ''
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/gravar-categoria', async (req, res) => {
+  const { id, id_akaii } = req.body;
+  if (!id || !id_akaii) return res.status(400).json({ error: 'ID da notícia e ID da categoria obrigatórios' });
+
+  try {
+    const url = `http://noticia.valuescomunicacao.com.br/b3/site/m020/noticia_exe.asp?op=SALVAR_CATEGORIA&cd_noticia=${id}&lista_categoria=${id_akaii}`;
+    const r = await fetch(url);
+    const txt = await r.text();
+    res.json({ ok: true, resposta: txt });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
