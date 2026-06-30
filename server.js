@@ -46,11 +46,13 @@ app.get('/buscar-noticia', async (req, res) => {
   try {
     const url = `http://noticia.valuescomunicacao.com.br/b3/api/noticia/?key=${AKAII_KEY}&id=${id}&formato=json`;
     const r = await fetch(url);
-    const rawText = await r.text();
+    const buffer = await r.arrayBuffer();
+    const decoder = new TextDecoder('iso-8859-1');
+    const rawText = decoder.decode(buffer);
 
-    let data;
+    let parsed;
     try {
-      data = JSON.parse(rawText);
+      parsed = JSON.parse(rawText);
     } catch (parseErr) {
       console.error('Resposta não-JSON da API Akaii:', rawText.slice(0, 500));
       return res.status(502).json({
@@ -59,16 +61,18 @@ app.get('/buscar-noticia', async (req, res) => {
       });
     }
 
-    const item = Array.isArray(data) ? data[0] : data;
+    const lista = Array.isArray(parsed) ? parsed : (parsed.data || parsed.noticias || [parsed]);
+    const item = Array.isArray(lista) ? lista[0] : lista;
+
     if (!item || !item.texto) {
       return res.status(404).json({
         error: 'Notícia não encontrada ou sem texto disponível',
-        debug_estrutura: JSON.stringify(data).slice(0, 1000)
+        debug_estrutura: JSON.stringify(parsed).slice(0, 1000)
       });
     }
     res.json({
       titulo: item.titulo || '',
-      texto: item.texto || '',
+      texto: (item.texto || '').replace(/<br\s*\/?>/gi, '\n').replace(/\n{3,}/g, '\n\n').trim(),
       veiculo: item.veiculo || '',
       data: item.data || '',
       categoria_atual: item.categoria || ''
