@@ -1,83 +1,133 @@
 const express = require('express');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
 const UPSTASH_URL = process.env.UPSTASH_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_TOKEN;
+const APP_PASSWORD = process.env.APP_PASSWORD || 'values2026';
+
 const PAUTAS_KEY = 'b3:pautas';
+const HISTORICO_KEY = 'b3:historico';
+const SESSIONS_KEY = 'b3:sessions';
 
-// --- GESTÃO DE PAUTAS VIA UPSTASH ---
-async function lerPautas() {
-  if (!UPSTASH_URL || !UPSTASH_TOKEN) {
-    console.log('Upstash não configurado — UPSTASH_URL:', !!UPSTASH_URL, 'UPSTASH_TOKEN:', !!UPSTASH_TOKEN);
-    return [];
-  }
+// --- UPSTASH HELPERS ---
+async function upGet(key) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
   try {
-    const r = await fetch(`${UPSTASH_URL}/get/${PAUTAS_KEY}`, {
-      headers: {
-        Authorization: `Bearer ${UPSTASH_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
+    const r = await fetch(`${UPSTASH_URL}/get/${key}`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, 'Content-Type': 'application/json' }
     });
-    const text = await r.text();
-    console.log('Upstash GET status:', r.status, 'resposta:', text.slice(0, 300));
-    const data = JSON.parse(text);
-    return data.result ? JSON.parse(data.result) : [];
-  } catch (e) {
-    console.error('Erro ao ler pautas do Upstash:', e.message);
-    return [];
-  }
+    const data = await r.json();
+    return data.result ? JSON.parse(data.result) : null;
+  } catch (e) { console.error('Upstash GET erro:', e.message); return null; }
 }
 
-async function salvarPautas(pautas) {
-  if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
+async function upSet(key, value) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return false;
   try {
-    const encoded = encodeURIComponent(JSON.stringify(pautas));
-    const r = await fetch(`${UPSTASH_URL}/set/${PAUTAS_KEY}/${encoded}`, {
-      headers: {
-        Authorization: `Bearer ${UPSTASH_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
+    const encoded = encodeURIComponent(JSON.stringify(value));
+    const r = await fetch(`${UPSTASH_URL}/set/${key}/${encoded}`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, 'Content-Type': 'application/json' }
     });
-    const text = await r.text();
-    console.log('Upstash SET status:', r.status, 'resposta:', text.slice(0, 300));
-  } catch (e) {
-    console.error('Erro ao salvar pautas no Upstash:', e.message);
-  }
+    const data = await r.json();
+    return data.result === 'OK';
+  } catch (e) { console.error('Upstash SET erro:', e.message); return false; }
 }
 
-app.get('/pautas', async (req, res) => {
-  res.json(await lerPautas());
+// --- AUTENTICAÇÃO ---
+function gerarToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+async function validarSessao(req) {
+  const token = req.headers['x-session-token'];
+  if (!token) return false;
+  const sessions = await upGet(SESSIONS_KEY) || {};
+  const sessao = sessions[token];
+  if (!sessao) return false;
+  // Sessão válida por 12 horas
+  if (Date.now() - sessao.criada > 12 * 60 * 60 * 1000) {
+    delete sessions[token];
+    await upSet(SESSIONS_KEY, sessions);
+    return false;
+  }
+  return true;
+}
+
+app.post('/login', async (req, res) => {
+  const { senha } = req.body;
+  if (senha !== APP_PASSWORD) {
+    return res.status(401).json({ error: 'Senha incorreta' });
+  }
+  const token = gerarToken();
+  const sessions = await upGet(SESSIONS_KEY) || {};
+  sessions[token] = { criada: Date.now() };
+  await upSet(SESSIONS_KEY, sessions);
+  res.json({ token });
 });
 
-app.post('/pautas', async (req, res) => {
+app.post('/logout', async (req, res) => {
+  const token = req.headers['x-session-token'];
+  if (token) {
+    const sessions = await upGet(SESSIONS_KEY) || {};
+    delete sessions[token];
+    await upSet(SESSIONS_KEY, sessions);
+  }
+  res.json({ ok: true });
+});
+
+// Middleware de autenticação para rotas protegidas
+async function auth(req, res, next) {
+  if (!await validarSessao(req)) {
+    return res.status(401).json({ error: 'Não autorizado' });
+  }
+  next();
+}
+
+// --- PAUTAS ---
+app.get('/pautas', auth, async (req, res) => {
+  res.json(await upGet(PAUTAS_KEY) || []);
+});
+
+app.post('/pautas', auth, async (req, res) => {
   const { titulo, descricao } = req.body;
   if (!titulo) return res.status(400).json({ error: 'Título obrigatório' });
-  const pautas = await lerPautas();
+  const pautas = await upGet(PAUTAS_KEY) || [];
   const nova = { id: Date.now(), titulo: titulo.toUpperCase().trim(), descricao: (descricao || '').trim(), criada: new Date().toISOString() };
   pautas.push(nova);
-  await salvarPautas(pautas);
+  await upSet(PAUTAS_KEY, pautas);
   res.json(nova);
 });
 
-app.delete('/pautas/:id', async (req, res) => {
+app.delete('/pautas/:id', auth, async (req, res) => {
   const id = parseInt(req.params.id);
-  const pautas = (await lerPautas()).filter(p => p.id !== id);
-  await salvarPautas(pautas);
+  const pautas = (await upGet(PAUTAS_KEY) || []).filter(p => p.id !== id);
+  await upSet(PAUTAS_KEY, pautas);
+  res.json({ ok: true });
+});
+
+// --- HISTÓRICO ---
+app.get('/historico', auth, async (req, res) => {
+  const historico = await upGet(HISTORICO_KEY) || [];
+  res.json(historico.slice(0, 200));
+});
+
+app.delete('/historico', auth, async (req, res) => {
+  await upSet(HISTORICO_KEY, []);
   res.json({ ok: true });
 });
 
 // --- CLASSIFICAÇÃO ---
-app.post('/classificar', async (req, res) => {
-  const { texto } = req.body;
+app.post('/classificar', auth, async (req, res) => {
+  const { texto, veiculo, titulo_noticia } = req.body;
   if (!texto) return res.status(400).json({ error: 'Texto obrigatório' });
-  if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'Chave Anthropic não configurada no servidor' });
+  if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'Chave Anthropic não configurada' });
 
-  const pautas = await lerPautas();
+  const pautas = await upGet(PAUTAS_KEY) || [];
   const prompt = buildPrompt(texto, pautas);
 
   try {
@@ -98,12 +148,16 @@ app.post('/classificar', async (req, res) => {
     const raw = data.content?.[0]?.text || '';
 
     if (raw.trim().startsWith('{"aprovada"')) {
+      // Salvar no histórico como desaprovada
+      await salvarHistorico({ aprovada: false, titulo: titulo_noticia || texto.slice(0, 80), veiculo: veiculo || '', ts: new Date().toISOString() });
       return res.json({ aprovada: false });
     }
 
     try {
       const clean = raw.replace(/```json|```/g, '').trim();
       const parsed = JSON.parse(clean);
+      // Salvar no histórico
+      await salvarHistorico({ aprovada: true, titulo: titulo_noticia || texto.slice(0, 80), veiculo: veiculo || '', ts: new Date().toISOString(), resultado: parsed });
       return res.json({ aprovada: true, resultado: parsed });
     } catch {
       return res.json({ aprovada: true, resultado: raw });
@@ -113,53 +167,19 @@ app.post('/classificar', async (req, res) => {
   }
 });
 
-// --- BUSCA NO AKAII ---
-app.get('/buscar-noticia', async (req, res) => {
-  const { id } = req.query;
-  if (!id) return res.status(400).json({ error: 'ID da notícia obrigatório' });
-
-  const AKAII_KEY = process.env.AKAII_API_KEY;
-  if (!AKAII_KEY) return res.status(500).json({ error: 'Chave Akaii não configurada no servidor' });
-
+async function salvarHistorico(entrada) {
   try {
-    const url = `http://noticia.valuescomunicacao.com.br/b3/api/noticia/?key=${AKAII_KEY}&id=${id}&formato=json`;
-    const r = await fetch(url);
-    const buffer = await r.arrayBuffer();
-    const decoder = new TextDecoder('iso-8859-1');
-    const rawText = decoder.decode(buffer);
+    const historico = await upGet(HISTORICO_KEY) || [];
+    historico.unshift(entrada);
+    // Manter só os últimos 500
+    await upSet(HISTORICO_KEY, historico.slice(0, 500));
+  } catch (e) { console.error('Erro ao salvar histórico:', e.message); }
+}
 
-    let parsed;
-    try {
-      parsed = JSON.parse(rawText);
-    } catch {
-      return res.status(502).json({
-        error: 'A API do Akaii retornou uma resposta inválida.',
-        raw_preview: rawText.slice(0, 300)
-      });
-    }
 
-    const lista = Array.isArray(parsed) ? parsed : (parsed.data || parsed.noticias || [parsed]);
-    const item = Array.isArray(lista) ? lista[0] : lista;
 
-    if (!item || !item.texto) {
-      return res.status(404).json({
-        error: 'Notícia não encontrada ou sem texto disponível',
-        debug_estrutura: JSON.stringify(parsed).slice(0, 1000)
-      });
-    }
-
-    res.json({
-      titulo: item.titulo || '',
-      texto: (item.texto || '').replace(/<br\s*\/?>/gi, '\n').replace(/\n{3,}/g, '\n\n').trim(),
-      veiculo: item.veiculo || '',
-      data: item.data || '',
-      categoria_atual: item.categoria || ''
-    });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
+// Servir arquivos estáticos APÓS autenticação via frontend
+app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -240,7 +260,7 @@ CAM: Câmara de Arbitragem do Mercado, processos arbitrais.
 REGULADORES: CVM, Banco Central, CADE, STN quando associados diretamente à B3.
 ASSUNTOS DE INTERESSE: casos de empresas brasileiras em crise sistêmica com impacto no mercado financeiro local (Americanas, REAG, Master e similares).
 
-id_9793: Verifique se a matéria corresponde a alguma pauta ativa cadastrada abaixo. Se corresponder retorne o nome exato da pauta em CAIXA ALTA. Se não houver correspondência retorne null. É PROIBIDO gerar pautas livremente. Este campo é independente do id_9902.
+id_9793: REGRAS ABSOLUTAS para este campo: (1) Só preencha se a matéria tratar EXATAMENTE do mesmo assunto de uma pauta cadastrada abaixo. (2) Se não houver nenhuma pauta cadastrada, retorne SEMPRE null. (3) Se houver pautas cadastradas mas o assunto da matéria for diferente, retorne SEMPRE null. (4) É TERMINANTEMENTE PROIBIDO sugerir, criar ou inventar pautas que não estejam na lista abaixo. (5) Quando retornar uma pauta, use o nome exato em CAIXA ALTA.
 
 PAUTAS ATIVAS:
 ${listaPautas}
