@@ -12,26 +12,39 @@ const PAUTAS_KEY = 'b3:pautas';
 
 // --- GESTÃO DE PAUTAS VIA UPSTASH ---
 async function lerPautas() {
-  if (!UPSTASH_URL || !UPSTASH_TOKEN) return [];
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) {
+    console.log('Upstash não configurado — UPSTASH_URL:', !!UPSTASH_URL, 'UPSTASH_TOKEN:', !!UPSTASH_TOKEN);
+    return [];
+  }
   try {
     const r = await fetch(`${UPSTASH_URL}/get/${PAUTAS_KEY}`, {
       headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
     });
     const data = await r.json();
+    console.log('Upstash GET resposta:', JSON.stringify(data).slice(0, 200));
     return data.result ? JSON.parse(data.result) : [];
-  } catch { return []; }
+  } catch (e) {
+    console.error('Erro ao ler pautas do Upstash:', e.message);
+    return [];
+  }
 }
 
 async function salvarPautas(pautas) {
   if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
-  await fetch(`${UPSTASH_URL}/set/${PAUTAS_KEY}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${UPSTASH_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ value: JSON.stringify(pautas) })
-  });
+  try {
+    const r = await fetch(`${UPSTASH_URL}/set/${PAUTAS_KEY}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ value: JSON.stringify(pautas) })
+    });
+    const data = await r.json();
+    console.log('Upstash SET resposta:', JSON.stringify(data));
+  } catch (e) {
+    console.error('Erro ao salvar pautas no Upstash:', e.message);
+  }
 }
 
 app.get('/pautas', async (req, res) => {
