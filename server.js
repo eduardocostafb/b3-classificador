@@ -18,10 +18,14 @@ async function lerPautas() {
   }
   try {
     const r = await fetch(`${UPSTASH_URL}/get/${PAUTAS_KEY}`, {
-      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+      headers: {
+        Authorization: `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
     });
-    const data = await r.json();
-    console.log('Upstash GET resposta:', JSON.stringify(data).slice(0, 200));
+    const text = await r.text();
+    console.log('Upstash GET status:', r.status, 'resposta:', text.slice(0, 300));
+    const data = JSON.parse(text);
     return data.result ? JSON.parse(data.result) : [];
   } catch (e) {
     console.error('Erro ao ler pautas do Upstash:', e.message);
@@ -32,16 +36,15 @@ async function lerPautas() {
 async function salvarPautas(pautas) {
   if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
   try {
-    const r = await fetch(`${UPSTASH_URL}/set/${PAUTAS_KEY}`, {
-      method: 'POST',
+    const encoded = encodeURIComponent(JSON.stringify(pautas));
+    const r = await fetch(`${UPSTASH_URL}/set/${PAUTAS_KEY}/${encoded}`, {
       headers: {
         Authorization: `Bearer ${UPSTASH_TOKEN}`,
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ value: JSON.stringify(pautas) })
+      }
     });
-    const data = await r.json();
-    console.log('Upstash SET resposta:', JSON.stringify(data));
+    const text = await r.text();
+    console.log('Upstash SET status:', r.status, 'resposta:', text.slice(0, 300));
   } catch (e) {
     console.error('Erro ao salvar pautas no Upstash:', e.message);
   }
