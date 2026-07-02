@@ -7,100 +7,93 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #f5f5f3;
-    --surface: #ffffff;
-    --border: #e2e2df;
-    --border-strong: #c8c8c4;
-    --text: #1a1a18;
-    --text-muted: #888880;
-    --accent: #1a56db;
-    --accent-bg: #eff6ff;
-    --accent-border: #bfdbfe;
-    --success: #15803d;
-    --success-bg: #f0fdf4;
-    --warn: #b45309;
-    --warn-bg: #fffbeb;
-    --warn-border: #fde68a;
-    --danger-bg: #fef2f2;
-    --danger: #b91c1c;
-    --radius: 8px;
+    --bg: #f5f5f3; --surface: #fff; --border: #e2e2df; --border-strong: #c8c8c4;
+    --text: #1a1a18; --text-muted: #888880; --accent: #1a56db; --accent-bg: #eff6ff;
+    --accent-border: #bfdbfe; --success: #15803d; --success-bg: #f0fdf4;
+    --warn: #b45309; --warn-bg: #fffbeb; --warn-border: #fde68a;
+    --danger-bg: #fef2f2; --danger: #b91c1c; --radius: 8px;
   }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  .header { background: #0a2463; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
-  .header img { height: 32px; filter: brightness(0) invert(1); }
+  .header { background: #0a2463; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
   .header h1 { font-size: 16px; font-weight: 500; }
-  .header span { font-size: 13px; opacity: .6; margin-left: auto; }
-  .container { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+  .header span { font-size: 13px; opacity: .6; }
+  .container { max-width: 920px; margin: 0 auto; padding: 24px 16px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab { padding: 10px 18px; font-size: 14px; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; border-radius: 0; border-left: none; border-right: none; border-top: none; height: auto; font-family: inherit; }
+  .tab:hover { color: var(--text); background: none; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
   label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
-  textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; resize: vertical; min-height: 200px; line-height: 1.6; color: var(--text); background: #fafaf9; transition: border-color .15s; }
-  textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+  textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; resize: vertical; min-height: 180px; line-height: 1.6; color: var(--text); background: #fafaf9; }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  input[type="text"] { width: 100%; height: 38px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; background: #fafaf9; color: var(--text); }
+  input[type="text"]:focus { outline: none; border-color: var(--accent); }
   .row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
   button { height: 38px; padding: 0 18px; border: 1px solid var(--border-strong); border-radius: var(--radius); font-size: 14px; font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--text); transition: background .15s; }
   button:hover { background: var(--bg); }
   button:active { transform: scale(.98); }
   .btn-primary { background: #0a2463; color: #fff; border-color: #0a2463; font-weight: 500; }
   .btn-primary:hover { background: #0d2d7a; }
-  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
   .btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
+  .btn-danger { background: var(--danger-bg); color: var(--danger); border-color: #fecaca; }
+  .btn-danger:hover { background: #fee2e2; }
   .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-  .result-header { background: var(--accent-bg); border-bottom: 1px solid var(--accent-border); padding: 14px 20px; }
+  .result-header { background: var(--accent-bg); border-bottom: 1px solid var(--accent-border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .result-subtema { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
   .result-tema { font-size: 17px; font-weight: 600; color: var(--accent); }
   .result-body { padding: 16px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .result-field { }
   .result-field.full { grid-column: 1 / -1; }
   .field-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
   .field-value { font-size: 14px; color: var(--text); background: #fafaf9; border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; line-height: 1.5; }
-  .field-value.mono { font-family: monospace; font-size: 13px; }
+  .field-value.positiva { background: var(--success-bg); border-color: #bbf7d0; color: var(--success); font-weight: 600; }
+  .field-value.negativa { background: var(--danger-bg); border-color: #fecaca; color: var(--danger); font-weight: 600; }
+  .field-value.neutra { background: #fffbeb; border-color: var(--warn-border); color: var(--warn); font-weight: 600; }
   .field-value.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn); }
-  .conf-row { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-  .conf-label { font-size: 12px; color: var(--text-muted); min-width: 130px; }
-  .conf-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .conf-bar { height: 100%; border-radius: 3px; transition: width .4s; }
-  .conf-pct { font-size: 12px; font-weight: 600; min-width: 36px; text-align: right; }
+  .field-value.pauta { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); font-weight: 600; }
+  .field-value.pv-sim { background: var(--success-bg); border-color: #bbf7d0; color: var(--success); font-weight: 600; }
+  .field-value.pv-nao { background: var(--danger-bg); border-color: #fecaca; color: var(--danger); font-weight: 600; }
   .alert { padding: 10px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 12px; }
   .alert-error { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
   .alert-ok { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
   .loading { display: flex; align-items: center; gap: 10px; padding: 20px; color: var(--text-muted); font-size: 14px; }
-  .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+  .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .hist-section { }
-  .hist-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+  .preview-box { background: #fafaf9; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-top: 12px; font-size: 13px; color: var(--text-muted); max-height: 120px; overflow-y: auto; line-height: 1.5; }
+  .preview-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .desaprovada { background: var(--danger-bg); border: 1px solid #fecaca; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 16px; }
+  .desaprovada h3 { color: var(--danger); font-size: 16px; margin-bottom: 8px; }
+  .desaprovada p { color: var(--text-muted); font-size: 14px; }
+  .pauta-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; gap: 12px; }
+  .pauta-info { flex: 1; }
+  .pauta-titulo { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
+  .pauta-desc { font-size: 13px; color: var(--text-muted); }
+  .pauta-empty { text-align: center; padding: 24px; color: var(--text-muted); font-size: 14px; }
   .hist-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; gap: 12px; }
   .hist-item:last-child { border-bottom: none; }
-  .hist-item:hover .hist-noticia { color: var(--accent); }
-  .hist-noticia { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  .hist-item:hover .hist-titulo { color: var(--accent); }
+  .hist-titulo { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
   .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
   .badge-blue { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
   .hist-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
-  .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
-  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-  .tab { padding: 10px 18px; font-size: 14px; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; border-radius: 0; border-left: none; border-right: none; border-top: none; height: auto; }
-  .tab:hover { background: none; color: var(--text); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-  .id-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-  .id-row .id-field { flex: 1; min-width: 200px; }
-  input[type="text"] { width: 100%; height: 38px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; background: #fafaf9; color: var(--text); }
-  input[type="text"]:focus { outline: none; border-color: var(--accent); background: #fff; }
-  .preview-box { background: #fafaf9; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-top: 12px; font-size: 13px; color: var(--text-secondary); max-height: 160px; overflow-y: auto; line-height: 1.5; }
-  .preview-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
   @media (max-width: 600px) { .result-body { grid-template-columns: 1fr; } .result-field.full { grid-column: 1; } }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Classificador de Clipping</h1>
-  <span>B3 — Values Comunicação</span>
+  <h1>Classificador de Clipping — B3</h1>
+  <span>Values Comunicação</span>
 </div>
 
 <div class="container">
-
   <div class="tabs">
-    <button class="tab active" id="tab-texto-btn" onclick="trocarAba('texto')">Colar texto</button>
-    <button class="tab" id="tab-id-btn" onclick="trocarAba('id')">Buscar por ID</button>
+    <button class="tab active" onclick="trocarAba('texto')">Colar texto</button>
+    <button class="tab" onclick="trocarAba('id')">Buscar por ID</button>
+    <button class="tab" onclick="trocarAba('pautas')">Pautas ativas</button>
   </div>
 
+  <!-- ABA TEXTO -->
   <div id="aba-texto">
     <div class="card">
       <label for="txt">Texto da matéria</label>
@@ -110,21 +103,17 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           Analisar
         </button>
-        <button onclick="limpar()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-          Limpar
-        </button>
+        <button onclick="limpar()">Limpar</button>
       </div>
     </div>
   </div>
 
+  <!-- ABA ID -->
   <div id="aba-id" style="display:none">
     <div class="card">
       <label for="noticia-id">ID da notícia no Akaii</label>
-      <div class="id-row">
-        <div class="id-field">
-          <input type="text" id="noticia-id" placeholder="Ex: 231396331">
-        </div>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="noticia-id" placeholder="Ex: 231396331" style="flex:1">
         <button class="btn-primary" id="btn-buscar" onclick="buscarPorId()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           Buscar e analisar
@@ -134,113 +123,116 @@
     </div>
   </div>
 
+  <!-- ABA PAUTAS -->
+  <div id="aba-pautas" style="display:none">
+    <div class="card">
+      <label>Cadastrar nova pauta</label>
+      <input type="text" id="pauta-titulo" placeholder="Nome da pauta em caixa alta (ex: LANÇAMENTO DO ECOSSISTEMA DE DUPLICATAS ESCRITURAIS)" style="margin-bottom:8px">
+      <textarea id="pauta-desc" placeholder="Descrição opcional — contexto da pauta para ajudar na identificação automática..." style="min-height:80px;margin-top:8px"></textarea>
+      <div class="row">
+        <button class="btn-primary" onclick="cadastrarPauta()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Cadastrar pauta
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <label>Pautas cadastradas</label>
+      <div id="lista-pautas"><div class="pauta-empty">Carregando...</div></div>
+    </div>
+  </div>
+
   <div id="status"></div>
   <div id="resultado"></div>
 
   <div class="card" id="hist-card" style="display:none">
-    <div class="hist-section">
-      <div class="hist-title">Histórico da sessão</div>
-      <div id="historico"></div>
-    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Histórico da sessão</div>
+    <div id="historico"></div>
   </div>
-
 </div>
 
 <script>
-const ID_MAP = {'1':38039,'2':37877,'3':38019,'4':37869,'5':37881,'6':37888,'7':37879,'8':37886,'9':38038,'10':37889,'11':37891,'12':37860};
 let historico = [];
 let noticiaAtualId = null;
 
-function trocarAba(aba){
-  document.getElementById('aba-texto').style.display = aba === 'texto' ? 'block' : 'none';
-  document.getElementById('aba-id').style.display = aba === 'id' ? 'block' : 'none';
-  document.getElementById('tab-texto-btn').classList.toggle('active', aba === 'texto');
-  document.getElementById('tab-id-btn').classList.toggle('active', aba === 'id');
+function trocarAba(aba) {
+  ['texto','id','pautas'].forEach(a => {
+    document.getElementById('aba-' + a).style.display = a === aba ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', ['texto','id','pautas'][i] === aba);
+  });
   document.getElementById('status').innerHTML = '';
+  if (aba === 'pautas') carregarPautas();
 }
 
-async function buscarPorId(){
-  const id = document.getElementById('noticia-id').value.trim();
-  if(!id){ alert('Informe o ID da notícia.'); return; }
-
-  const btn = document.getElementById('btn-buscar');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> Buscando...';
-  document.getElementById('preview-noticia').innerHTML = '';
-  document.getElementById('resultado').innerHTML = '';
-  document.getElementById('status').innerHTML = '';
-
+// --- PAUTAS ---
+async function carregarPautas() {
+  const el = document.getElementById('lista-pautas');
   try {
-    const r = await fetch(`/buscar-noticia?id=${encodeURIComponent(id)}`);
-    const rawText = await r.text();
-    let data;
-    try {
-      data = JSON.parse(rawText);
-    } catch {
-      throw new Error('O servidor retornou uma resposta inesperada. Veja o console do navegador (F12) para detalhes.');
+    const r = await fetch('/pautas');
+    const pautas = await r.json();
+    if (!pautas.length) {
+      el.innerHTML = '<div class="pauta-empty">Nenhuma pauta cadastrada. Adicione pautas acima para que o sistema identifique automaticamente nas matérias.</div>';
+      return;
     }
-    if(data.error) throw new Error(data.error + (data.raw_preview ? ` — Resposta: ${data.raw_preview}` : '') + (data.debug_estrutura ? ` — Estrutura recebida: ${data.debug_estrutura}` : ''));
-
-    noticiaAtualId = id;
-    document.getElementById('preview-noticia').innerHTML = `
-      <div class="preview-box">
-        <div class="preview-title">${data.titulo}</div>
-        <div style="color:var(--text-muted);font-size:12px;margin-bottom:8px">${data.veiculo} · ${data.data}</div>
-        ${data.texto.slice(0,400)}${data.texto.length > 400 ? '...' : ''}
-      </div>
-    `;
-
-    btn.innerHTML = '<div class="spinner"></div> Classificando...';
-    document.getElementById('resultado').innerHTML = '<div class="loading"><div class="spinner"></div> Classificando com IA...</div>';
-
-    const textoCompleto = `${data.titulo}\n\n${data.texto}`;
-    const r2 = await fetch('/classificar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ texto: textoCompleto })
-    });
-    const data2 = await r2.json();
-    if(data2.error) throw new Error(data2.error);
-
-    const p = parse(data2.resultado);
-    const conf = calcConf(p);
-    historico.unshift({ texto: data.titulo.slice(0,90), result: p, ts: new Date() });
-    renderResultado(p, conf, id);
-    renderHistorico();
-  } catch(e) {
-    document.getElementById('resultado').innerHTML = '';
-    document.getElementById('status').innerHTML = `<div class="alert alert-error">Erro: ${e.message}</div>`;
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Buscar e analisar';
+    el.innerHTML = pautas.map(p => `
+      <div class="pauta-item">
+        <div class="pauta-info">
+          <div class="pauta-titulo">${p.titulo}</div>
+          ${p.descricao ? `<div class="pauta-desc">${p.descricao}</div>` : ''}
+        </div>
+        <button class="btn-sm btn-danger" onclick="removerPauta(${p.id})">Remover</button>
+      </div>`).join('');
+  } catch {
+    el.innerHTML = '<div class="pauta-empty">Erro ao carregar pautas.</div>';
   }
 }
 
-function copiarComandoChrome(){
-  const p = window._lastResult;
-  if(!p || !noticiaAtualId || !p.id_akaii) return;
-  const comando = `Na notícia ID ${noticiaAtualId} aberta nesta página do Akaii, clique no link do campo "Assunto" para abrir o modal de categorias, desmarque a categoria atual se houver, marque o checkbox com value="${p.id_akaii}" (${p.tema}), clique em Salvar e confirme o alert de sucesso.`;
-  navigator.clipboard.writeText(comando).then(() => {
-    document.getElementById('status').innerHTML = '<div class="alert alert-ok">Comando copiado. Abra a notícia no Akaii, acione o Claude Chrome e cole o comando para gravar a categoria.</div>';
-  });
+async function cadastrarPauta() {
+  const titulo = document.getElementById('pauta-titulo').value.trim();
+  const descricao = document.getElementById('pauta-desc').value.trim();
+  if (!titulo) { alert('Informe o título da pauta.'); return; }
+  try {
+    const r = await fetch('/pautas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ titulo, descricao })
+    });
+    if (!r.ok) throw new Error();
+    document.getElementById('pauta-titulo').value = '';
+    document.getElementById('pauta-desc').value = '';
+    carregarPautas();
+    document.getElementById('status').innerHTML = '<div class="alert alert-ok">Pauta cadastrada com sucesso.</div>';
+    setTimeout(() => document.getElementById('status').innerHTML = '', 3000);
+  } catch {
+    alert('Erro ao cadastrar pauta.');
+  }
 }
 
-function limpar(){
+async function removerPauta(id) {
+  if (!confirm('Remover esta pauta?')) return;
+  await fetch('/pautas/' + id, { method: 'DELETE' });
+  carregarPautas();
+}
+
+// --- CLASSIFICAÇÃO ---
+function limpar() {
   document.getElementById('txt').value = '';
   document.getElementById('resultado').innerHTML = '';
   document.getElementById('status').innerHTML = '';
+  noticiaAtualId = null;
 }
 
-async function analisar(){
+async function analisar() {
   const txt = document.getElementById('txt').value.trim();
-  if(!txt){ alert('Cole o texto da matéria.'); return; }
-
+  if (!txt) { alert('Cole o texto da matéria.'); return; }
   const btn = document.getElementById('btn-analisar');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Analisando...';
   document.getElementById('status').innerHTML = '';
   document.getElementById('resultado').innerHTML = '<div class="loading"><div class="spinner"></div> Classificando com IA...</div>';
-
+  noticiaAtualId = null;
   try {
     const r = await fetch('/classificar', {
       method: 'POST',
@@ -248,11 +240,11 @@ async function analisar(){
       body: JSON.stringify({ texto: txt })
     });
     const data = await r.json();
-    if(data.error) throw new Error(data.error);
-    const p = parse(data.resultado);
-    const conf = calcConf(p);
-    historico.unshift({ texto: txt.slice(0,90)+'...', result: p, ts: new Date() });
-    renderResultado(p, conf);
+    if (data.error) throw new Error(data.error);
+    if (data.aprovada === false) { renderDesaprovada(); return; }
+    const p = parseResultado(data.resultado);
+    historico.unshift({ titulo: txt.slice(0, 80), result: p, ts: new Date() });
+    renderResultado(p, null);
     renderHistorico();
   } catch(e) {
     document.getElementById('resultado').innerHTML = '';
@@ -263,183 +255,164 @@ async function analisar(){
   }
 }
 
-function parse(txt){
-  const g = l => {
-    const m = txt.match(new RegExp(l + ':\\s*(.+?)(?=\\n[A-ZÇÃÕ]|$)', 'si'));
-    return m ? m[1].trim() : '';
-  };
-  const tema = g('TEMA');
-  const tnum = (tema.match(/^(\d+)/)||[])[1] || '';
-  return {
-    tema, tnum,
-    subtema: g('SUBTEMA'),
-    assunto: g('ASSUNTO'),
-    gatilho: g('GATILHO IDENTIFICADO'),
-    just: g('JUSTIFICATIVA'),
-    avaliacao: g('AVALIAÇÃO QUALITATIVA'),
-    avaliacaoJust: g('JUSTIFICATIVA DA AVALIAÇÃO'),
-    sugestaoPV: g('SUGESTÃO DE PORTA-VOZ'),
-    pv: g('PORTA-VOZ NÃO MAPEADO'),
-    alerta: g('ALERTA ESTRATÉGICO'),
-    id_akaii: ID_MAP[tnum] || null
-  };
+async function buscarPorId() {
+  const id = document.getElementById('noticia-id').value.trim();
+  if (!id) { alert('Informe o ID da notícia.'); return; }
+  const btn = document.getElementById('btn-buscar');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Buscando...';
+  document.getElementById('preview-noticia').innerHTML = '';
+  document.getElementById('resultado').innerHTML = '';
+  document.getElementById('status').innerHTML = '';
+
+  try {
+    const r = await fetch(`/buscar-noticia?id=${encodeURIComponent(id)}`);
+    const data = await r.json();
+    if (data.error) throw new Error(data.error + (data.debug_estrutura ? ' | ' + data.debug_estrutura.slice(0,200) : ''));
+
+    noticiaAtualId = id;
+    document.getElementById('preview-noticia').innerHTML = `
+      <div class="preview-box">
+        <div class="preview-title">${data.titulo}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">${data.veiculo} · ${data.data}</div>
+        ${data.texto.slice(0,400)}${data.texto.length > 400 ? '...' : ''}
+      </div>`;
+
+    btn.innerHTML = '<div class="spinner"></div> Classificando...';
+    document.getElementById('resultado').innerHTML = '<div class="loading"><div class="spinner"></div> Classificando com IA...</div>';
+
+    const r2 = await fetch('/classificar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto: `${data.titulo}\n\n${data.texto}` })
+    });
+    const data2 = await r2.json();
+    if (data2.error) throw new Error(data2.error);
+    if (data2.aprovada === false) { renderDesaprovada(); return; }
+    const p = parseResultado(data2.resultado);
+    historico.unshift({ titulo: data.titulo.slice(0, 80), result: p, ts: new Date() });
+    renderResultado(p, id);
+    renderHistorico();
+  } catch(e) {
+    document.getElementById('resultado').innerHTML = '';
+    document.getElementById('status').innerHTML = `<div class="alert alert-error">Erro: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Buscar e analisar';
+  }
 }
 
-function calcConf(p){
-  let s = 0;
-  if(p.tnum) s += 40;
-  if(p.subtema) s += 20;
-  if(p.gatilho && p.gatilho.length > 3) s += 25;
-  if(p.just && p.just.length > 20) s += 15;
-  return Math.min(s, 100);
+function parseResultado(r) {
+  if (typeof r === 'object' && r !== null) return r;
+  try { return JSON.parse((r || '').replace(/```json|```/g, '').trim()); } catch { return {}; }
 }
 
-function confColor(c){ return c >= 75 ? '#15803d' : c >= 50 ? '#b45309' : '#b91c1c'; }
-function confLabel(c){ return c >= 75 ? 'Alta confiança' : c >= 50 ? 'Confiança moderada' : 'Baixa — revise'; }
-
-function avalColor(a){
-  if(!a) return '#888880';
-  const v = a.toUpperCase();
-  if(v.includes('POSITIVA')) return '#15803d';
-  if(v.includes('NEGATIVA')) return '#b91c1c';
-  return '#b45309';
-}
-function avalBg(a){
-  if(!a) return '#fafaf9';
-  const v = a.toUpperCase();
-  if(v.includes('POSITIVA')) return '#f0fdf4';
-  if(v.includes('NEGATIVA')) return '#fef2f2';
-  return '#fffbeb';
-}
-function pvCitado(s){
-  return s && s.toUpperCase().includes('CITADO NA MATÉRIA');
-}
-function pvNaoCitado(s){
-  return s && s.toUpperCase().includes('NÃO CITADO');
+function renderDesaprovada() {
+  document.getElementById('resultado').innerHTML = `
+    <div class="desaprovada">
+      <h3>Matéria não aprovada</h3>
+      <p>A matéria não tem relação com a B3, seu mercado, concorrentes ou temas de interesse estratégico do mercado financeiro brasileiro.</p>
+    </div>`;
 }
 
-function renderResultado(p, conf, idNoticia){
-  const hasPV = p.pv && p.pv !== 'Nenhum' && p.pv.length > 2;
-  const hasAlerta = p.alerta && p.alerta !== 'Nenhum' && p.alerta.length > 2;
-  const hasAssunto = p.assunto && p.assunto.length > 2;
-  const hasAval = p.avaliacao && p.avaliacao.length > 2;
-  const hasSugestao = p.sugestaoPV && p.sugestaoPV.length > 2;
-  const mostrarGravar = !!idNoticia && !!p.id_akaii;
+function renderResultado(p, idNoticia) {
+  const qual = (p['id_9791'] || '').toUpperCase();
+  const qualClass = qual.includes('POSITIVA') ? 'positiva' : qual.includes('NEGATIVA') ? 'negativa' : qual.includes('NEUTRA') ? 'neutra' : '';
+  const hasPauta = p['id_9793'] && p['id_9793'] !== 'null' && p['id_9793'] !== null;
+  const hasPV = p['id_9897'] && p['id_9897'] !== 'null' && p['id_9897'] !== null;
+  const pvClass = hasPV ? 'pv-sim' : '';
+  const expl9791 = p['explicacao-id_9791'] || '';
+  const alertaMatch = expl9791.match(/\|\s*Alerta:\s*(.+)/s);
+  const alerta = alertaMatch ? alertaMatch[1].trim() : null;
+  const explicacao = expl9791.replace(/\|\s*Alerta:.+/s, '').trim();
 
   document.getElementById('resultado').innerHTML = `
     <div class="result-card">
-      <div class="result-header" style="display:flex;align-items:center;justify-content:space-between">
-        <div class="result-tema">${p.tema || '—'}</div>
-        <button class="btn-sm copy-btn" onclick="copiar()">Copiar resultado</button>
+      <div class="result-header">
+        <div>
+          <div class="result-subtema">Subtema</div>
+          <div class="result-tema">${p['id_9888'] || '—'}</div>
+        </div>
+        <button class="btn-sm" onclick="copiar()">Copiar resultado</button>
       </div>
       <div class="result-body">
         <div class="result-field">
-          <div class="field-label">Subtema</div>
-          <div class="field-value">${p.subtema || '—'}</div>
+          <div class="field-label">Sugestão de Temas</div>
+          <div class="field-value">${p['id_9902'] || '—'}</div>
         </div>
         <div class="result-field">
-          <div class="field-label">ID Akaii</div>
-          <div class="field-value mono">${p.id_akaii || '—'}</div>
+          <div class="field-label">Qualitativo Institucional</div>
+          <div class="field-value ${qualClass}">${p['id_9791'] || '—'}</div>
         </div>
-        ${hasAssunto ? `
+        <div class="result-field">
+          <div class="field-label">Citação no Título</div>
+          <div class="field-value">${p['id_9821'] || '—'}</div>
+        </div>
+        <div class="result-field">
+          <div class="field-label">Citação da Marca</div>
+          <div class="field-value">${p['id_9901'] || '—'}</div>
+        </div>
+        ${hasPauta ? `
         <div class="result-field full">
-          <div class="field-label">Assunto</div>
-          <div class="field-value" style="font-weight:600;letter-spacing:.02em">${p.assunto}</div>
+          <div class="field-label">Pauta identificada</div>
+          <div class="field-value pauta">${p['id_9793']}</div>
         </div>` : ''}
         <div class="result-field full">
-          <div class="field-label">Gatilho identificado</div>
-          <div class="field-value">${p.gatilho || '—'}</div>
+          <div class="field-label">Porta Vozes</div>
+          <div class="field-value ${pvClass}">${hasPV ? p['id_9897'] : 'Nenhum porta-voz citado'}</div>
         </div>
         <div class="result-field full">
           <div class="field-label">Justificativa</div>
-          <div class="field-value">${p.just || '—'}</div>
+          <div class="field-value">${explicacao || p['explicacao-id_9888'] || '—'}</div>
         </div>
-        ${hasAval ? `
+        ${alerta ? `
         <div class="result-field full">
-          <div class="field-label">Avaliação qualitativa institucional</div>
-          <div class="field-value" style="background:${avalBg(p.avaliacao)};border-color:${avalColor(p.avaliacao)}33;color:${avalColor(p.avaliacao)};font-weight:600">
-            ${p.avaliacao}${p.avaliacaoJust ? ` — ${p.avaliacaoJust}` : ''}
-          </div>
-        </div>` : ''}
-        ${hasSugestao ? `
-        <div class="result-field full">
-          <div class="field-label">Porta-voz citado na matéria</div>
-          <div class="field-value" style="${pvNaoCitado(p.sugestaoPV) ? 'background:var(--danger-bg);border-color:#fecaca;color:var(--danger);font-weight:600' : pvCitado(p.sugestaoPV) ? 'background:var(--success-bg);border-color:#bbf7d0;color:var(--success);font-weight:600' : ''}">${p.sugestaoPV}</div>
-        </div>` : ''}
-        ${hasPV ? `
-        <div class="result-field full">
-          <div class="field-label" style="color:var(--warn)">⚠ Porta-voz não mapeado</div>
-          <div class="field-value warn">${p.pv}</div>
-        </div>` : ''}
-        ${hasAlerta ? `
-        <div class="result-field full">
-          <div class="field-label" style="color:var(--warn)">⚠ Alerta estratégico</div>
-          <div class="field-value warn">${p.alerta}</div>
+          <div class="field-label" style="color:var(--warn)">Alerta estratégico</div>
+          <div class="field-value warn">${alerta}</div>
         </div>` : ''}
       </div>
-      <div class="conf-row">
-        <div class="conf-label">${confLabel(conf)}</div>
-        <div class="conf-bar-wrap">
-          <div class="conf-bar" style="width:${conf}%;background:${confColor(conf)}"></div>
-        </div>
-        <div class="conf-pct" style="color:${confColor(conf)}">${conf}%</div>
-      </div>
-      ${mostrarGravar ? `
-      <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <button class="btn-primary btn-sm" id="btn-gravar" onclick="copiarComandoChrome()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          Copiar comando para Claude Chrome
-        </button>
-        <span style="font-size:12px;color:var(--text-muted)">ID Akaii: <strong style="color:var(--text)">${p.id_akaii}</strong> — abra a notícia no Akaii e cole o comando no Claude Chrome</span>
-      </div>` : ''}
-    </div>
-  `;
+    </div>`;
   window._lastResult = p;
 }
 
-function copiar(){
+function copiar() {
   const p = window._lastResult;
-  if(!p) return;
-  const txt = [
-    `TEMA: ${p.tema}`,
-    `SUBTEMA: ${p.subtema}`,
-    p.assunto ? `ASSUNTO: ${p.assunto}` : '',
-    `GATILHO: ${p.gatilho}`,
-    `JUSTIFICATIVA: ${p.just}`,
-    `ID AKAII: ${p.id_akaii || '—'}`,
-    p.avaliacao ? `AVALIAÇÃO QUALITATIVA: ${p.avaliacao}${p.avaliacaoJust ? ' — ' + p.avaliacaoJust : ''}` : '',
-    p.sugestaoPV ? `SUGESTÃO DE PORTA-VOZ: ${p.sugestaoPV}` : '',
-    p.pv && p.pv !== 'Nenhum' ? `PORTA-VOZ NÃO MAPEADO: ${p.pv}` : '',
-    p.alerta && p.alerta !== 'Nenhum' ? `ALERTA ESTRATÉGICO: ${p.alerta}` : ''
+  if (!p) return;
+  const linhas = [
+    `SUBTEMA: ${p['id_9888'] || ''}`,
+    `SUGESTÃO DE TEMAS: ${p['id_9902'] || ''}`,
+    `QUALITATIVO INSTITUCIONAL: ${p['id_9791'] || ''}`,
+    `CITAÇÃO NO TÍTULO: ${p['id_9821'] || ''}`,
+    `CITAÇÃO DA MARCA: ${p['id_9901'] || ''}`,
+    p['id_9793'] ? `PAUTA: ${p['id_9793']}` : '',
+    p['id_9897'] ? `PORTA VOZES: ${p['id_9897']}` : '',
   ].filter(Boolean).join('\n');
-  navigator.clipboard.writeText(txt).then(() => {
-    document.getElementById('status').innerHTML = '<div class="alert alert-ok">Resultado copiado para a área de transferência.</div>';
+  navigator.clipboard.writeText(linhas).then(() => {
+    document.getElementById('status').innerHTML = '<div class="alert alert-ok">Resultado copiado.</div>';
     setTimeout(() => document.getElementById('status').innerHTML = '', 2500);
   });
 }
 
-function renderHistorico(){
+function renderHistorico() {
   const card = document.getElementById('hist-card');
   const el = document.getElementById('historico');
-  if(!historico.length){ card.style.display = 'none'; return; }
+  if (!historico.length) { card.style.display = 'none'; return; }
   card.style.display = 'block';
   el.innerHTML = historico.slice(0, 10).map((h, i) => `
     <div class="hist-item" onclick="carregarHist(${i})">
-      <div class="hist-noticia">${h.texto}</div>
-      <div class="badge badge-blue">${h.result.tnum ? h.result.tnum + '. ' + (h.result.tema.replace(/^\d+\s*[—\-]\s*/,'').split('|')[0].trim().slice(0,20)) : '—'}</div>
-      <div class="hist-time">${h.ts.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
-    </div>
-  `).join('');
+      <div class="hist-titulo">${h.titulo}</div>
+      <div class="badge badge-blue">${h.result['id_9888'] || '—'}</div>
+      <div class="hist-time">${h.ts.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</div>
+    </div>`).join('');
 }
 
-function carregarHist(i){
-  const h = historico[i];
-  renderResultado(h.result, calcConf(h.result));
+function carregarHist(i) {
+  renderResultado(historico[i].result, null);
   window.scrollTo(0, 0);
 }
 
 document.getElementById('txt').addEventListener('keydown', e => {
-  if(e.ctrlKey && e.key === 'Enter') analisar();
+  if (e.ctrlKey && e.key === 'Enter') analisar();
 });
 </script>
 </body>
